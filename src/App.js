@@ -1,24 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import { ResourceLoader } from "./ResourceLoader";
+import { UserInfo } from "./UserInfo";
+import { ProductInfo } from "./ProductInfo";
+import axios from "axios";
+import { DataSource } from "./DataSource";
+
+const getServerData = (url) => async () => {
+  const { data } = await axios.get(url);
+  return data;
+};
+
+const getLocalStorageData = (key) => () => {
+  return localStorage.getItem(key);
+};
+
+const Text = ({ message }) => <h1>{message}</h1>;
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ResourceLoader resourceUrl="/users/123" resourceName="user">
+        <UserInfo />
+      </ResourceLoader>
+      <ResourceLoader resourceUrl="/products/101" resourceName="product">
+        <ProductInfo />
+      </ResourceLoader>
+      <DataSource getDataFunc={getServerData("/users/123")} resourceName="user">
+        <UserInfo />
+      </DataSource>
+      <DataSource
+        getDataFunc={getLocalStorageData("message")}
+        resourceName="message"
+      >
+        <Text />
+      </DataSource>
+    </>
   );
 }
 
